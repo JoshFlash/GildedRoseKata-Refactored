@@ -55,7 +55,8 @@ public class GildedRoseTest
     [ClassData(typeof(LegendaryItemData))]
     public void WhenUpdatingQuality_ItemSellInIsCorrectlyDecremented(Item item)
     {
-        int expectedSellIn = item.SellIn - 1;
+        int expectedSellIn = item.Name.Equals("Sulfuras, Hand of Ragnaros") ? item.SellIn : item.SellIn - 1;
+
         IList<Item> items = new List<Item> { item };
         GildedRose app = new GildedRose(items);
         app.UpdateQuality();
@@ -68,7 +69,8 @@ public class GildedRoseTest
     [ClassData(typeof(LegendaryItemData))]
     public void WhenUpdatingQuality_ItemQualityIsCorrectlyDecremented(Item item)
     {
-        int expectedQuality = item.Quality > 0 ? item.Quality - 1 : 0;
+        int expectedQuality = item.SellIn > 0 ? item.Quality - 1 : item.Quality - 2;
+        expectedQuality = System.Math.Max(expectedQuality, 0);
         IList<Item> items = new List<Item> { item };
         GildedRose app = new GildedRose(items);
         app.UpdateQuality();

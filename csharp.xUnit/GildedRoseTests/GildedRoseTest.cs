@@ -25,7 +25,8 @@ public class GildedRoseTest
             new Item { Name = "Elixir of the Mongoose", SellIn = 5, Quality = 7 },
             new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 15, Quality = 20 },
             new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 10, Quality = 49 },
-            new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 5, Quality = 49 }
+            new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 5, Quality = 49 },
+            new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 0, Quality = 50 }
         );
     }
     
@@ -69,11 +70,47 @@ public class GildedRoseTest
     [ClassData(typeof(LegendaryItemData))]
     public void WhenUpdatingQuality_ItemQualityIsCorrectlyDecremented(Item item)
     {
-        int expectedQuality = item.SellIn > 0 ? item.Quality - 1 : item.Quality - 2;
-        expectedQuality = System.Math.Max(expectedQuality, 0);
+        int expectedQuality = GetExpectedQuality(item);
+        bool unconstrainedQuality = IsLegendary(item) && item.Quality >= 0;
+        if (!unconstrainedQuality)
+        {
+            expectedQuality = System.Math.Clamp(expectedQuality, 0, 50);
+        }
+        
         IList<Item> items = new List<Item> { item };
         GildedRose app = new GildedRose(items);
         app.UpdateQuality();
         Assert.Equal(expectedQuality, items[0].Quality);
     }
+    
+    private int GetExpectedQuality(Item item)
+    {
+        if (IsLegendary(item))
+        {
+            return item.Quality < 0 ? 0 : item.Quality;
+        }
+        if (IsAppreciating(item))
+        {
+            switch (item.Name)
+            {
+                case "Aged Brie":
+                    return item.Quality + 1;
+                case "Backstage passes to a TAFKAL80ETC concert":
+                    return item.SellIn <= 0 ? 0 
+                        : item.SellIn > 10 ? item.Quality + 1 
+                        : item.SellIn > 5 ? item.Quality + 2 
+                        : item.Quality + 3;
+                default:
+                    return item.Quality + 1;
+            }
+        }
+        
+        return item.SellIn > 0 ? item.Quality - 1 : item.Quality - 2;
+    }
+    
+    private static bool IsLegendary(Item item) => item.Name.Equals("Sulfuras, Hand of Ragnaros");
+    
+    private static bool IsAppreciating(Item item) => 
+        item.Name.Equals("Aged Brie") || item.Name.ToLowerInvariant().Contains("backstage pass");
+
 }

@@ -87,19 +87,16 @@ public class GildedRoseTest
     {
         if (IsLegendary(item))
         {
-            return item.Quality < 0 ? 0 : item.Quality;
+            return QualityEvaluator.Static(item.SellIn, item.Quality);
         }
         if (IsAppreciating(item))
         {
             switch (item.Name)
             {
                 case "Aged Brie":
-                    return item.Quality + 1;
+                    return QualityEvaluator.DefaultAppreciation(item.SellIn, item.Quality);
                 case "Backstage passes to a TAFKAL80ETC concert":
-                    return item.SellIn <= 0 ? 0 
-                        : item.SellIn > 10 ? item.Quality + 1 
-                        : item.SellIn > 5 ? item.Quality + 2 
-                        : item.Quality + 3;
+                    return QualityEvaluator.LimitedTimeOnly(item.SellIn, item.Quality);
                 default:
                     return QualityEvaluator.DefaultDepreciation(item.SellIn, item.Quality);
             }

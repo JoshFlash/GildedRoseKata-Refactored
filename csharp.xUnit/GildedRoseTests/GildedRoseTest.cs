@@ -73,15 +73,9 @@ public class GildedRoseTest
     {
         IList<Item> items = new List<Item> { item };
         var assetTypeMap = new AssetTypeMap(items);
-        int expectedQuality = GetExpectedQuality(item, assetTypeMap);
+        int expectedQuality = QualityEvaluator.GetExpectedQuality(item, assetTypeMap);
         GildedRose app = new GildedRose(items);
         app.UpdateQuality();
         Assert.Equal(expectedQuality, items[0].Quality);
-    }
-    
-    private int GetExpectedQuality(Item item, AssetTypeMap assetTypeMap)
-    {
-        var EvaluationMethod = QualityEvaluator.GetEvaluationFromAssetType(assetTypeMap[item.Name]);
-        return EvaluationMethod(item.SellIn, item.Quality);
     }
 }

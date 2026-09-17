@@ -9,7 +9,13 @@ public static class QualityEvaluator
     
     public delegate int QualityEvaluation(int sellIn, int quality);
     
-    public static QualityEvaluation GetEvaluationFromAssetType(AssetType assetType)
+    public static int GetExpectedQuality(Item item, AssetTypeMap assetTypeMap)
+    {
+        var EvaluationMethod = GetEvaluationFromAssetType(assetTypeMap[item.Name]);
+        return EvaluationMethod(item.SellIn, item.Quality);
+    }
+
+    private static QualityEvaluation GetEvaluationFromAssetType(AssetType assetType)
     {
         return assetType switch
         {

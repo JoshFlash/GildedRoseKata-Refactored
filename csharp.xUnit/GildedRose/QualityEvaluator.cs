@@ -9,7 +9,13 @@ public static class QualityEvaluator
     
     public delegate int QualityEvaluation(int sellIn, int quality);
     
-    public static QualityEvaluation GetEvaluationFromAssetType(AssetType assetType)
+    public static int GetExpectedQuality(Item item, AssetTypeMap assetTypeMap)
+    {
+        var EvaluationMethod = GetEvaluationFromAssetType(assetTypeMap[item.Name]);
+        return EvaluationMethod(item.SellIn, item.Quality);
+    }
+
+    private static QualityEvaluation GetEvaluationFromAssetType(AssetType assetType)
     {
         return assetType switch
         {
@@ -24,7 +30,7 @@ public static class QualityEvaluator
     
     private static readonly QualityEvaluation DefaultDepreciation = (sellIn, quality) => Math.Clamp(sellIn > 0 ? quality - 1 : quality - 2, MinQuality, MaxQuality);
     private static readonly QualityEvaluation Static = (_, quality) => Math.Max(MinQuality, quality);
-    private static readonly QualityEvaluation DefaultAppreciation = (_, quality) => Math.Clamp(quality + 1, MinQuality, MaxQuality);
+    private static readonly QualityEvaluation DefaultAppreciation = (sellIn, quality) => Math.Clamp(sellIn > 0 ? quality + 1 : quality + 2, MinQuality, MaxQuality);
     private static readonly QualityEvaluation LimitedTimeOnly = (sellIn, quality) =>
     {
         var result = sellIn <= 0 ? 0
@@ -35,5 +41,5 @@ public static class QualityEvaluator
         return Math.Clamp(result, MinQuality, MaxQuality);
     };
     
-    public static QualityEvaluation ConjuredDepreciation = (sellIn, quality) => throw new NotImplementedException();
+    private static readonly QualityEvaluation ConjuredDepreciation = (sellIn, quality) => Math.Clamp(sellIn > 0 ? quality - 2 : quality - 4, MinQuality, MaxQuality);
 }

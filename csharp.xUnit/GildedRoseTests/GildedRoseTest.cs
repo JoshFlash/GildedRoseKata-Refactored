@@ -38,10 +38,20 @@ public class GildedRoseTest
         );
     }
     
+    private class ConjuredItemData : TheoryData<Item>
+    {
+        public ConjuredItemData() => AddRange(
+            new Item { Name = "Conjured Mana Cake", SellIn = 3, Quality = 6 },
+            new Item { Name = "Conjured Mana Cake", SellIn = 0, Quality = 2 },
+            new Item { Name = "Conjured Mana Cake", SellIn = 0, Quality = 2 }
+        );
+    }
+    
     [Theory]
     [ClassData(typeof(DefaultItemData))]
     [ClassData(typeof(AppreciatingItemData))]
     [ClassData(typeof(LegendaryItemData))]
+    [ClassData(typeof(ConjuredItemData))]
     public void WhenUpdatingQuality_ItemNameIsUnaltered(Item item)
     {
         IList<Item> items = new List<Item> { item };
@@ -54,6 +64,7 @@ public class GildedRoseTest
     [ClassData(typeof(DefaultItemData))]
     [ClassData(typeof(AppreciatingItemData))]
     [ClassData(typeof(LegendaryItemData))]
+    [ClassData(typeof(ConjuredItemData))]
     public void WhenUpdatingQuality_ItemSellInIsCorrectlyDecremented(Item item)
     {
         IList<Item> items = new List<Item> { item };
@@ -69,19 +80,14 @@ public class GildedRoseTest
     [ClassData(typeof(DefaultItemData))]
     [ClassData(typeof(AppreciatingItemData))]
     [ClassData(typeof(LegendaryItemData))]
+    [ClassData(typeof(ConjuredItemData))]
     public void WhenUpdatingQuality_ItemQualityIsCorrectlyDecremented(Item item)
     {
         IList<Item> items = new List<Item> { item };
         var assetTypeMap = new AssetTypeMap(items);
-        int expectedQuality = GetExpectedQuality(item, assetTypeMap);
+        int expectedQuality = QualityEvaluator.GetExpectedQuality(item, assetTypeMap);
         GildedRose app = new GildedRose(items);
         app.UpdateQuality();
         Assert.Equal(expectedQuality, items[0].Quality);
-    }
-    
-    private int GetExpectedQuality(Item item, AssetTypeMap assetTypeMap)
-    {
-        var EvaluationMethod = QualityEvaluator.GetEvaluationFromAssetType(assetTypeMap[item.Name]);
-        return EvaluationMethod(item.SellIn, item.Quality);
     }
 }

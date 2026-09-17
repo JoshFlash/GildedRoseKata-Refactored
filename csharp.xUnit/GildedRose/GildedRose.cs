@@ -15,6 +15,24 @@ public class GildedRose
     
     public void UpdateQuality()
     {
+        foreach (var item in Items)
+        {
+            item.Quality = QualityEvaluator.GetExpectedQuality(item, AssetTypeMap);
+            UpdateSellIn(item);
+        }
+    }
+
+    private void UpdateSellIn(Item item)
+    {
+        if (AssetTypeMap[item.Name].Equals(AssetType.Legendary))
+            return;
+        
+        item.SellIn--;
+    }
+
+    [System.Obsolete("Replaced by Quality Evaluator strategy")]
+    public void UpdateQuality_Obsolete()
+    {
         // update item quality for default depreciation
         for (var i = 0; i < Items.Count; i++)
         {

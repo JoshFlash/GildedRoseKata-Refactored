@@ -41,5 +41,5 @@ public static class QualityEvaluator
         return Math.Clamp(result, MinQuality, MaxQuality);
     };
     
-    public static QualityEvaluation ConjuredDepreciation = (sellIn, quality) => throw new NotImplementedException();
+    private static readonly QualityEvaluation ConjuredDepreciation = (sellIn, quality) => Math.Clamp(sellIn > 0 ? quality - 2 : quality - 4, MinQuality, MaxQuality);
 }

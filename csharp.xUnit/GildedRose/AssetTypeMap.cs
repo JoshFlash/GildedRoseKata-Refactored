@@ -35,6 +35,7 @@ public class AssetTypeMap
     
     public AssetTypeMap(IList<Item> items)
     {
+        // TODO Next: Load asset type data for each item from a catalogue data-source instead
         _assetTypeByItemName = new Dictionary<string, AssetType>();
         foreach (var item in items)
         {

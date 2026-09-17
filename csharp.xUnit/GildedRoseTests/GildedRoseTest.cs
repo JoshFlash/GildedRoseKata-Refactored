@@ -101,7 +101,7 @@ public class GildedRoseTest
                         : item.SellIn > 5 ? item.Quality + 2 
                         : item.Quality + 3;
                 default:
-                    return item.Quality + 1;
+                    return QualityEvaluator.DefaultDepreciation(item.SellIn, item.Quality);
             }
         }
         

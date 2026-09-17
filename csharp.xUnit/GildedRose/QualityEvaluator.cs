@@ -30,7 +30,7 @@ public static class QualityEvaluator
     
     private static readonly QualityEvaluation DefaultDepreciation = (sellIn, quality) => Math.Clamp(sellIn > 0 ? quality - 1 : quality - 2, MinQuality, MaxQuality);
     private static readonly QualityEvaluation Static = (_, quality) => Math.Max(MinQuality, quality);
-    private static readonly QualityEvaluation DefaultAppreciation = (_, quality) => Math.Clamp(quality + 1, MinQuality, MaxQuality);
+    private static readonly QualityEvaluation DefaultAppreciation = (sellIn, quality) => Math.Clamp(sellIn > 0 ? quality + 1 : quality + 2, MinQuality, MaxQuality);
     private static readonly QualityEvaluation LimitedTimeOnly = (sellIn, quality) =>
     {
         var result = sellIn <= 0 ? 0

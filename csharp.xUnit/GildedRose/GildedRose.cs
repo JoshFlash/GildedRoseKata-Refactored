@@ -5,14 +5,17 @@ namespace GildedRoseKata;
 public class GildedRose
 {
     IList<Item> Items;
+    AssetTypeMap AssetTypeMap;
 
-    public GildedRose(IList<Item> Items)
+    public GildedRose(IList<Item> items)
     {
-        this.Items = Items;
+        Items = items;
+        AssetTypeMap = new AssetTypeMap(items);
     }
-
+    
     public void UpdateQuality()
     {
+        // update item quality for default depreciation
         for (var i = 0; i < Items.Count; i++)
         {
             if (Items[i].Name != "Aged Brie" && Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
@@ -52,11 +55,13 @@ public class GildedRose
                 }
             }
 
+            // update sell-in values
             if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
             {
                 Items[i].SellIn = Items[i].SellIn - 1;
             }
 
+            // update item quality for special items
             if (Items[i].SellIn < 0)
             {
                 if (Items[i].Name != "Aged Brie")
@@ -86,4 +91,5 @@ public class GildedRose
             }
         }
     }
+    
 }

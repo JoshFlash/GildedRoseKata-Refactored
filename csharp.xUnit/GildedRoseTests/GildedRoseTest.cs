@@ -56,9 +56,10 @@ public class GildedRoseTest
     [ClassData(typeof(LegendaryItemData))]
     public void WhenUpdatingQuality_ItemSellInIsCorrectlyDecremented(Item item)
     {
-        int expectedSellIn = item.Name.Equals("Sulfuras, Hand of Ragnaros") ? item.SellIn : item.SellIn - 1;
-
         IList<Item> items = new List<Item> { item };
+        var assetTypeMap = new AssetTypeMap(items);
+        bool isLegendary = assetTypeMap[item.Name].Equals(AssetType.Legendary);
+        int expectedSellIn = isLegendary ? item.SellIn : item.SellIn - 1;
         GildedRose app = new GildedRose(items);
         app.UpdateQuality();
         Assert.Equal(expectedSellIn, items[0].SellIn);
@@ -70,44 +71,17 @@ public class GildedRoseTest
     [ClassData(typeof(LegendaryItemData))]
     public void WhenUpdatingQuality_ItemQualityIsCorrectlyDecremented(Item item)
     {
-        int expectedQuality = GetExpectedQuality(item);
-        bool unconstrainedQuality = IsLegendary(item) && item.Quality >= 0;
-        if (!unconstrainedQuality)
-        {
-            expectedQuality = System.Math.Clamp(expectedQuality, 0, 50);
-        }
-        
         IList<Item> items = new List<Item> { item };
+        var assetTypeMap = new AssetTypeMap(items);
+        int expectedQuality = GetExpectedQuality(item, assetTypeMap);
         GildedRose app = new GildedRose(items);
         app.UpdateQuality();
         Assert.Equal(expectedQuality, items[0].Quality);
     }
     
-    private int GetExpectedQuality(Item item)
+    private int GetExpectedQuality(Item item, AssetTypeMap assetTypeMap)
     {
-        if (IsLegendary(item))
-        {
-            return QualityEvaluator.Static(item.SellIn, item.Quality);
-        }
-        if (IsAppreciating(item))
-        {
-            switch (item.Name)
-            {
-                case "Aged Brie":
-                    return QualityEvaluator.DefaultAppreciation(item.SellIn, item.Quality);
-                case "Backstage passes to a TAFKAL80ETC concert":
-                    return QualityEvaluator.LimitedTimeOnly(item.SellIn, item.Quality);
-                default:
-                    return QualityEvaluator.DefaultDepreciation(item.SellIn, item.Quality);
-            }
-        }
-        
-        return item.SellIn > 0 ? item.Quality - 1 : item.Quality - 2;
+        var EvaluationMethod = QualityEvaluator.GetEvaluationFromAssetType(assetTypeMap[item.Name]);
+        return EvaluationMethod(item.SellIn, item.Quality);
     }
-    
-    private static bool IsLegendary(Item item) => item.Name.Equals("Sulfuras, Hand of Ragnaros");
-    
-    private static bool IsAppreciating(Item item) => 
-        item.Name.Equals("Aged Brie") || item.Name.ToLowerInvariant().Contains("backstage pass");
-
 }
